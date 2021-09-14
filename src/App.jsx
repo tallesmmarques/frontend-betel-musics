@@ -38,6 +38,7 @@ function App() {
       .then(res => {
         setMusics(res.data)
         setLoading(false)
+        console.log(res.data)
       })
       .catch(err => console.error(err))
   }
