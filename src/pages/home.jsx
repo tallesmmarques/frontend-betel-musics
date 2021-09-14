@@ -1,3 +1,4 @@
+import {Link as ReactLink} from "react-router-dom"
 import {
   Box,
   Text,
@@ -10,6 +11,7 @@ import {
   Th,
   Button,
   Link,
+  Image,
 } from "@chakra-ui/react"
 import {
   AddIcon, 
@@ -17,20 +19,24 @@ import {
 } from "@chakra-ui/icons"
 
 function Home ({musics}) {
+
   return (
     <Flex bg="#f3f4f5" minH="100vh" flexDirection="column">
 
       <Box h="5px" bg="blue.500"></Box>
 
-      <Box p="50px" bg="white" boxShadow="sm">
-        <Text pb="5px" color="blackAlpha.500">Coletânia de Músicas</Text>
-        <Heading>Betel Musics</Heading>
+      <Box p="30px" pt="20px" bg="white" boxShadow="sm" display="flex" flexDirection="row">
+        <Image src="logo_betel.png" alt="Logo Betel" boxSize="120px" objectFit="cover" />
+        <Flex flexDirection="column" justify="center" ml="20px" mt="40px">
+          <Text pb="5px" color="blackAlpha.500">Coletânia de Músicas</Text>
+          <Heading>Betel Musics</Heading>
+        </Flex>
       </Box>
 
       <Box p="50px" px="100px">
         <Flex pb="20px" align="center" >
           <Heading flex="1" size="md">Todas Músicas</Heading>
-          <Button colorScheme="blue" variant="outline" maxW="150px"><AddIcon mr="10px"/> Criar Música</Button>
+          <Button colorScheme="blue" variant="solid" maxW="150px" as={ReactLink} to="/create"><AddIcon mr="10px"/> Criar Música</Button>
         </Flex>
         <Table variant="simple" bg="white" boxShadow="sm">
           <Thead>
@@ -49,7 +55,7 @@ function Home ({musics}) {
                 <Tr key={music.id}>
                   <Th textTransform="none" fontSize="14px" minW="200px" fontWeight="light" isTruncated>{music.name}</Th>
                   <Th textTransform="none" fontSize="14px" minW="200px" fontWeight="light" isTruncated>{music.author}</Th>
-                  <Th textTransform="none" fontSize="14px" minW="100px" bg="gray.50" fontWeight="light" isTruncated>Adoração</Th>
+                  <Th textTransform="none" fontSize="14px" minW="100px" bg="gray.50" fontWeight="light" isTruncated>{music.gender}</Th>
                   {[tomAlber, tomLucimeire, tomAdolescentes].map((field, index) => (
                     <Th key={index} textTransform="none" maxW="50px" fontSize="14px" fontWeight="light">{field}</Th>
                   ))}
