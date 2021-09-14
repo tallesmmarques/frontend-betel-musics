@@ -12,9 +12,11 @@ import {
   Button,
   Link,
   Image,
+  IconButton,
 } from "@chakra-ui/react"
 import {
   AddIcon, 
+  EditIcon, 
   ExternalLinkIcon
 } from "@chakra-ui/icons"
 
@@ -33,7 +35,7 @@ function Home ({musics}) {
         </Flex>
       </Box>
 
-      <Box p="50px" px="100px">
+      <Box p="50px" px="40px">
         <Flex pb="20px" align="center" >
           <Heading flex="1" size="md">Todas Músicas</Heading>
           <Button colorScheme="blue" variant="solid" maxW="150px" as={ReactLink} to="/create"><AddIcon mr="10px"/> Criar Música</Button>
@@ -41,7 +43,7 @@ function Home ({musics}) {
         <Table variant="simple" bg="white" boxShadow="sm">
           <Thead>
             <Tr>
-              {["Música", "Artista", "Gênero", "Alber", "Lucimeire", "Adolescentes", "CifraClub", "Youtube"].map(field => (
+              {["Música", "Artista", "Gênero", "Alber", "Lucimeire", "Adolescentes", "CifraClub", "Youtube", ""].map(field => (
                 <Th key={field} pt="15px" fontSize="11px" fontWeight="bold" isTruncated>{field}</Th>
               ))}
             </Tr>
@@ -64,6 +66,10 @@ function Home ({musics}) {
                       <Link href={field} isExternal>Acessar Link <ExternalLinkIcon mx="2px" mb="2px"/></Link>
                     </Th>
                   ))}
+
+                  <Th maxW="55px" px="5px">
+                    <IconButton icon={<EditIcon />} variant="link" maxW="150px" as={ReactLink} to={`/update/${music.id}`}>Edit</IconButton>
+                  </Th>
                 </Tr>
               )
             })}

@@ -1,14 +1,15 @@
 import {useEffect, useState} from "react"
 import api from "./service/api"
-
-import Loading from "./components/loading"
-import Home from "./pages/home"
 import {
   BrowserRouter as Router,
   Switch,
   Route,
 } from "react-router-dom";
+
+import Loading from "./components/loading"
+import Home from "./pages/home"
 import Create from "./pages/create";
+import Update from "./pages/update";
 
 function App() {
   const [musics, setMusics] = useState([{
@@ -51,7 +52,10 @@ function App() {
         <Route path="/create">
           <Create fetchMusics={fetchMusics} />
         </Route>
-        <Route path="/" exact>
+        <Route path="/update/:id">
+          <Update fetchMusics={fetchMusics} setLoading={setLoading} />
+        </Route>
+        <Route path="/">
           <Home musics={musics}/>
         </Route>
       </Switch>
