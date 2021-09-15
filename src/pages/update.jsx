@@ -18,6 +18,11 @@ function Update({ fetchMusics, setLoading }) {
     "sdn-lucimeire": "",
     adolescentes: ""
   })
+  const [lastPlayeds, setLastPlayeds] = useState({
+    "sdn-alber": "",
+    "sdn-lucimeire": "",
+    adolescentes: ""
+  })
   const [isOpen, setIsOpen] = useState(false)
   const onClose = () => setIsOpen(false)
   const cancelRef = useRef()
@@ -29,15 +34,21 @@ function Update({ fetchMusics, setLoading }) {
       const data = res.data
       setValue(data)
 
-      const alber = data.ministeriosInfo.find(e => e.ministerio === "sdn-alber")?.tom
-      const lucymeire = data.ministeriosInfo.find(e => e.ministerio === "sdn-lucimeire")?.tom
-      const adolescentes = data.ministeriosInfo.find(e => e.ministerio === "adolescentes")?.tom
+      const alber = data.ministeriosInfo.find(e => e.ministerio === "sdn-alber")
+      const lucymeire = data.ministeriosInfo.find(e => e.ministerio === "sdn-lucimeire")
+      const adolescentes = data.ministeriosInfo.find(e => e.ministerio === "adolescentes")
       const ministerios = {
-        "sdn-alber": alber,
-        "sdn-lucimeire": lucymeire,
-        adolescentes: adolescentes
+        "sdn-alber": alber?.tom,
+        "sdn-lucimeire": lucymeire?.tom,
+        adolescentes: adolescentes?.tom
       }
       setMinisterios(ministerios)
+      const lastPlayeds = {
+        "sdn-alber": alber?.lastPlayed,
+        "sdn-lucimeire": lucymeire?.lastPlayed,
+        adolescentes: adolescentes?.lastPlayed
+      }
+      setLastPlayeds(lastPlayeds)
     }).catch(err => console.log(err))
   }, [id])
 
@@ -47,6 +58,9 @@ function Update({ fetchMusics, setLoading }) {
   const handleChangeTom = (e) => {
     setMinisterios(prev => ({ ...prev, [e.target.name]: e.target.value }))
   }
+  const handleChangeLast = (e) => {
+    setLastPlayeds(prev => ({ ...prev, [e.target.name]: e.target.value }))
+  }
   const handleSubmit = async (e) => {
     e.preventDefault()
 
@@ -54,7 +68,8 @@ function Update({ fetchMusics, setLoading }) {
       (["sdn-alber", "sdn-lucimeire", "adolescentes"]).forEach(async element => {
         await api.put(`/music/${id}/${element}`, {
           tom: ministerios[element],
-          ministerio: element
+          ministerio: element,
+          "lastPlayed": lastPlayeds[element]
         }).then(res => {
           fetchMusics()
           history.push("/")
@@ -71,7 +86,7 @@ function Update({ fetchMusics, setLoading }) {
 
   return (
     <Center bg="#f3f4f5" minH="100vh">
-      <Box bg="white" p="1.5rem" py="2rem" w="450px" borderRadius="sm" shadow="md">
+      <Box bg="white" p="1.5rem" py="2rem" w="550px" borderRadius="sm" shadow="md">
         <form onSubmit={handleSubmit}>
           <Stack spacing={4}>
             <Heading size="lg" textAlign="center" mb="1rem">Atualizar Música</Heading>
@@ -94,6 +109,12 @@ function Update({ fetchMusics, setLoading }) {
               <Input onChange={handleChangeTom} name="sdn-lucimeire" value={ministerios["sdn-lucimeire"]} placeholder="Lucymeire" />
               <Input onChange={handleChangeTom} name="adolescentes" value={ministerios.adolescentes} placeholder="Adolescentes" />
             </HStack>
+            <Text><b>Última vez tocada:</b> Alber / Lucymeire / Adolescentes</Text>
+            <HStack spacing={4}>
+              <Input size="sm" type="date" onChange={handleChangeLast} name="sdn-alber" value={lastPlayeds["sdn-alber"]} />
+              <Input size="sm" type="date" onChange={handleChangeLast} name="sdn-lucimeire" value={lastPlayeds["sdn-lucimeire"]} />
+              <Input size="sm" type="date" onChange={handleChangeLast} name="adolescentes" value={lastPlayeds.adolescentes} />
+            </HStack>
 
             <HStack spacing={4} pt={5}>
               <Button flex="1" colorScheme="blue" variant="outline" onClick={() => history.push("/")}>Cancelar</Button>
@@ -113,7 +134,7 @@ function Update({ fetchMusics, setLoading }) {
         <AlertDialogOverlay>
           <AlertDialogContent>
             <AlertDialogHeader fontSize="lg" fontWeight="bold">
-                Apagar Música
+              Apagar Música
             </AlertDialogHeader>
 
             <AlertDialogBody>
