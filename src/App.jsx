@@ -1,4 +1,4 @@
-import {useEffect, useState} from "react"
+import { useEffect, useState } from "react"
 import api from "./service/api"
 import {
   BrowserRouter as Router,
@@ -38,13 +38,12 @@ function App() {
       .then(res => {
         setMusics(res.data)
         setLoading(false)
-        console.log(res.data)
       })
       .catch(err => console.error(err))
   }
 
-  if(loading) {
-    return <Loading/>
+  if (loading) {
+    return <Loading />
   }
 
   return (
@@ -57,7 +56,7 @@ function App() {
           <Update fetchMusics={fetchMusics} setLoading={setLoading} />
         </Route>
         <Route path="/">
-          <Home musics={musics}/>
+          <Home musics={musics} />
         </Route>
       </Switch>
     </Router>
