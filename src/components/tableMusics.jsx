@@ -21,6 +21,7 @@ import {
   ExternalLinkIcon,
 } from "@chakra-ui/icons"
 import { useEffect, useState } from "react"
+import { differenceInWeeks } from "date-fns/esm"
 
 function TableMusics({ musics, title, ministerio }) {
   const [filter, setFilter] = useState("all")
@@ -55,7 +56,7 @@ function TableMusics({ musics, title, ministerio }) {
         setFilter={setFilter}
       />
 
-      <Table variant="simple" bg="white" boxShadow="sm">
+      <Table variant="simple" colorScheme="blackAlpha" bg="white" boxShadow="sm">
         <Thead>
           <Tr>
             {tableh.map(field => (
@@ -69,12 +70,13 @@ function TableMusics({ musics, title, ministerio }) {
             const tomLucimeire = music.ministeriosInfo.find(mi => mi.ministerio === "sdn-lucimeire")
             const tomAdolescentes = music.ministeriosInfo.find(mi => mi.ministerio === "adolescentes")
             const tom = { "sdn-alber": tomAlber, "sdn-lucimeire": tomLucimeire, "adolescentes": tomAdolescentes }
+            const lastPlayed = tom[filter]?.lastPlayed ? new Date(tom[filter]?.lastPlayed) : null
 
             return (
               <Tr key={music.id}>
                 <Th textTransform="none" fontSize="14px" minW="200px" fontWeight="light" isTruncated>{music.name}</Th>
                 <Th textTransform="none" fontSize="14px" minW="200px" fontWeight="light" isTruncated>{music.author}</Th>
-                <Th textTransform="none" fontSize="14px" minW="100px" bg="gray.50" fontWeight="light" isTruncated>{music.gender}</Th>
+                <Th textTransform="none" fontSize="14px" minW="100px" fontWeight="light" isTruncated>{music.gender}</Th>
                 {filter === "all" && [tomAlber?.tom, tomLucimeire?.tom, tomAdolescentes?.tom].map((field, index) => (
                   <Th key={index} textTransform="none" maxW="50px" fontSize="14px" fontWeight="light">{field}</Th>
                 ))}
@@ -84,11 +86,14 @@ function TableMusics({ musics, title, ministerio }) {
                   }</Th>
                 )}
                 {filter !== "all" && (
-                  <Th textTransform="none" minW="50px" fontSize="14px" fontWeight="light">{
-                    tom[filter]?.lastPlayed ? formatDistanceToNow(new Date(tom[filter]?.lastPlayed), {
-                      locale: ptBR
-                    }) : "Não tocada"
-                  }</Th>
+                  <Th textTransform="none" minW="50px" fontSize="14px" fontWeight="light"
+                    bg={lastPlayed ? (
+                      differenceInWeeks(new Date(), lastPlayed) < 1 ? "red.100" : (
+                        differenceInWeeks(new Date(), lastPlayed) < 2 ? "orange.100" : "green.100"
+                      )) : "blue.100"}
+                  >{
+                      lastPlayed ? formatDistanceToNow(lastPlayed) : "Não tocada"
+                    }</Th>
                 )}
                 {[music.linkCifra, music.linkYoutube].map((field, index) => (
                   <Th key={index} textTransform="none" fontSize="14px" fontWeight="light" textOverflow="ellipsis">
