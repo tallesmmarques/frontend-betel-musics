@@ -15,12 +15,12 @@ function Update({ fetchMusics, setLoading }) {
   })
   const [ministerios, setMinisterios] = useState({
     "sdn-alber": "",
-    "sdn-lucimeire": "",
+    "sdn-lucy": "",
     adolescentes: ""
   })
   const [lastPlayeds, setLastPlayeds] = useState({
     "sdn-alber": "",
-    "sdn-lucimeire": "",
+    "sdn-lucy": "",
     adolescentes: ""
   })
   const [isOpen, setIsOpen] = useState(false)
@@ -35,17 +35,17 @@ function Update({ fetchMusics, setLoading }) {
       setValue(data)
 
       const alber = data.ministeriosInfo.find(e => e.ministerio === "sdn-alber")
-      const lucymeire = data.ministeriosInfo.find(e => e.ministerio === "sdn-lucimeire")
+      const lucy = data.ministeriosInfo.find(e => e.ministerio === "sdn-lucy")
       const adolescentes = data.ministeriosInfo.find(e => e.ministerio === "adolescentes")
       const ministerios = {
         "sdn-alber": alber?.tom,
-        "sdn-lucimeire": lucymeire?.tom,
+        "sdn-lucy": lucy?.tom,
         adolescentes: adolescentes?.tom
       }
       setMinisterios(ministerios)
       const lastPlayeds = {
         "sdn-alber": alber?.lastPlayed,
-        "sdn-lucimeire": lucymeire?.lastPlayed,
+        "sdn-lucy": lucy?.lastPlayed,
         adolescentes: adolescentes?.lastPlayed
       }
       setLastPlayeds(lastPlayeds)
@@ -65,7 +65,7 @@ function Update({ fetchMusics, setLoading }) {
     e.preventDefault()
 
     await api.put(`/music/${id}`, value).then(res => {
-      (["sdn-alber", "sdn-lucimeire", "adolescentes"]).forEach(async element => {
+      (["sdn-alber", "sdn-lucy", "adolescentes"]).forEach(async element => {
         await api.put(`/music/${id}/${element}`, {
           tom: ministerios[element],
           ministerio: element,
@@ -106,13 +106,13 @@ function Update({ fetchMusics, setLoading }) {
             <Text><b>Tom:</b> Alber / Lucy Mary / Adolescentes</Text>
             <HStack spacing={4}>
               <Input onChange={handleChangeTom} name="sdn-alber" value={ministerios["sdn-alber"]} placeholder="Alber" />
-              <Input onChange={handleChangeTom} name="sdn-lucimeire" value={ministerios["sdn-lucimeire"]} placeholder="Lucy Mary" />
+              <Input onChange={handleChangeTom} name="sdn-lucy" value={ministerios["sdn-lucy"]} placeholder="Lucy Mary" />
               <Input onChange={handleChangeTom} name="adolescentes" value={ministerios.adolescentes} placeholder="Adolescentes" />
             </HStack>
             <Text><b>Última vez tocada:</b> Alber / Lucy Mary / Adolescentes</Text>
             <HStack spacing={4}>
               <Input size="sm" type="date" onChange={handleChangeLast} name="sdn-alber" value={lastPlayeds["sdn-alber"]} />
-              <Input size="sm" type="date" onChange={handleChangeLast} name="sdn-lucimeire" value={lastPlayeds["sdn-lucimeire"]} />
+              <Input size="sm" type="date" onChange={handleChangeLast} name="sdn-lucy" value={lastPlayeds["sdn-lucy"]} />
               <Input size="sm" type="date" onChange={handleChangeLast} name="adolescentes" value={lastPlayeds.adolescentes} />
             </HStack>
 

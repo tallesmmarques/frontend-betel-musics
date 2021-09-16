@@ -33,7 +33,7 @@ function TableMusics({ musics, title, ministerio }) {
       case "sdn-alber":
         setTableh(["Música", "Artista", "Gênero", "Alber", "Tocada há", "CifraClub", "Youtube", ""])
         break;
-      case "sdn-lucimeire":
+      case "sdn-lucy":
         setTableh(["Música", "Artista", "Gênero", "Lucy Mary", "Tocada há", "CifraClub", "Youtube", ""])
         break;
       case "adolescentes":
@@ -67,9 +67,9 @@ function TableMusics({ musics, title, ministerio }) {
           <Tbody>
             {musics.map(music => {
               const tomAlber = music.ministeriosInfo.find(mi => mi.ministerio === "sdn-alber")
-              const tomLucimeire = music.ministeriosInfo.find(mi => mi.ministerio === "sdn-lucimeire")
+              const tomLucy = music.ministeriosInfo.find(mi => mi.ministerio === "sdn-lucy")
               const tomAdolescentes = music.ministeriosInfo.find(mi => mi.ministerio === "adolescentes")
-              const tom = { "sdn-alber": tomAlber, "sdn-lucimeire": tomLucimeire, "adolescentes": tomAdolescentes }
+              const tom = { "sdn-alber": tomAlber, "sdn-lucy": tomLucy, "adolescentes": tomAdolescentes }
               const lastPlayed = tom[filter]?.lastPlayed ? new Date(tom[filter]?.lastPlayed) : null
 
               return (
@@ -77,7 +77,7 @@ function TableMusics({ musics, title, ministerio }) {
                   <Th textTransform="none" fontSize="14px" minW="200px" fontWeight="light" isTruncated>{music.name}</Th>
                   <Th textTransform="none" fontSize="14px" minW="200px" fontWeight="light" isTruncated>{music.author}</Th>
                   <Th textTransform="none" fontSize="14px" minW="100px" fontWeight="light" isTruncated>{music.gender}</Th>
-                  {filter === "all" && [tomAlber?.tom, tomLucimeire?.tom, tomAdolescentes?.tom].map((field, index) => (
+                  {filter === "all" && [tomAlber?.tom, tomLucy?.tom, tomAdolescentes?.tom].map((field, index) => (
                     <Th key={index} textTransform="none" maxW="50px" fontSize="14px" fontWeight="light">{field}</Th>
                   ))}
                   {filter !== "all" && (
@@ -124,7 +124,7 @@ function Header({ ministerio, title, filter, setFilter }) {
         <Select w="150px" mr="1rem" onChange={(e) => setFilter(e.target.value)} value={filter}>
           <option value="all">Todos</option>
           <option value="sdn-alber">Alber</option>
-          <option value="sdn-lucimeire">Lucymeire</option>
+          <option value="sdn-lucy">Lucy Mary</option>
           <option value="adolescentes">Adolescentes</option>
         </Select>
         : <></>}

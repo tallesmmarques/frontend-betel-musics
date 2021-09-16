@@ -4,16 +4,12 @@ import { ptBR } from "date-fns/locale"
 import {
   Box,
   Flex,
-  Heading,
   Button,
   Accordion,
   AccordionItem,
   AccordionButton,
   AccordionIcon,
   AccordionPanel,
-  Input,
-  InputGroup,
-  InputRightElement,
   Text,
   VStack,
   Link,
@@ -21,7 +17,7 @@ import {
   IconButton,
 } from "@chakra-ui/react"
 import {
-  AddIcon, EditIcon, ExternalLinkIcon, SearchIcon,
+  AddIcon, EditIcon, ExternalLinkIcon
 } from "@chakra-ui/icons"
 import { useState } from "react"
 
@@ -44,7 +40,7 @@ function TableMusics({ musics, title }) {
       <Accordion allowToggle mx="0px" bg="white">
         {musics.map((music, index) => {
           const alber = music.ministeriosInfo.find(mi => mi.ministerio === "sdn-alber")
-          const lucymary = music.ministeriosInfo.find(mi => mi.ministerio === "sdn-lucimeire")
+          const lucymary = music.ministeriosInfo.find(mi => mi.ministerio === "sdn-lucy")
           const adolescentes = music.ministeriosInfo.find(mi => mi.ministerio === "adolescentes")
           return (
             <AccordionItem key={index}>
@@ -75,7 +71,7 @@ function TableMusics({ musics, title }) {
                       <Text key={value} isTruncated>{value}</Text>
                     ))}
                     {[alber, lucymary, adolescentes].map(value => (
-                      <Box h="1.5rem" key={value.id} isTruncated>
+                      <Box h="1.5rem" key={value?.id} isTruncated>
                         <Badge textTransform="none" colorScheme="purple">{value?.tom ? `tom ${value?.tom}` : "nenhum Tom"}</Badge>
                         <Badge textTransform="none" colorScheme={
                           value?.lastPlayed ? (

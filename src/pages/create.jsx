@@ -14,7 +14,7 @@ function Create({ fetchMusics }) {
   })
   const [ministerios, setMinisterios] = useState({
     "sdn-alber": "",
-    "sdn-lucimeire": "",
+    "sdn-lucy": "",
     adolescentes: ""
   })
   const history = useHistory()
@@ -28,7 +28,7 @@ function Create({ fetchMusics }) {
   const handleSubmit = (e) => {
     const ministeriosInfo = [
       { ministerio: "sdn-alber", tom: ministerios["sdn-alber"] },
-      { ministerio: "sdn-lucimeire", tom: ministerios["sdn-lucimeire"] },
+      { ministerio: "sdn-lucy", tom: ministerios["sdn-lucy"] },
       { ministerio: "adolescentes", tom: ministerios["adolescentes"] }
     ]
     e.preventDefault()
@@ -63,7 +63,7 @@ function Create({ fetchMusics }) {
             <Text><b>Tom:</b> Alber / Lucy Mary / Adolescentes</Text>
             <HStack spacing={4}>
               <Input onChange={handleChangeTom} name="sdn-alber" value={ministerios["sdn-alber"]} placeholder="Alber" />
-              <Input onChange={handleChangeTom} name="sdn-lucimeire" value={ministerios["sdn-lucimeire"]} placeholder="Lucy Mary" />
+              <Input onChange={handleChangeTom} name="sdn-lucy" value={ministerios["sdn-lucy"]} placeholder="Lucy Mary" />
               <Input onChange={handleChangeTom} name="adolescentes" value={ministerios.adolescentes} placeholder="Adolescentes" />
             </HStack>
             <HStack spacing={4} pt={5}>
