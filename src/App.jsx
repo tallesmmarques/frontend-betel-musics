@@ -64,24 +64,3 @@ function App() {
 }
 
 export default App;
-
-  // const [updating, setUpdating] = useState({on: false, music: {}})
-  //
-  // const handleUpdate = (event, music) => {
-  //   setUpdating(past => ({on: true, music}))
-  // }
-  // const handleSave = (event, confirmation, music) => {
-  //   if (confirmation === "cancelar") setUpdating(past => ({...past, on: false}))
-  //   else {
-  //     api.put(`/music/${music.id}`, updating.music)
-  //       .then(res => {
-  //         console.log(res)
-  //         setUpdating(past => ({on: false, music: {} }))
-  //         document.location.reload()
-  //       })
-  //       .catch(err => console.log(err))
-  //   }
-  // }
-  // const handleInput = (event) => {
-  //   setUpdating(past => ({...past, music: {...past.music, [event.target.name]: event.target.value}}))
-  // }

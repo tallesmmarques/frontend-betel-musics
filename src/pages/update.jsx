@@ -86,7 +86,7 @@ function Update({ fetchMusics, setLoading }) {
 
   return (
     <Center bg="#f3f4f5" minH="100vh">
-      <Box bg="white" p="1.5rem" py="2rem" w="550px" borderRadius="sm" shadow="md">
+      <Box bg="white" p="1.5rem" py="2rem" w="550px" borderRadius="sm" shadow="md" overflowX="auto">
         <form onSubmit={handleSubmit}>
           <Stack spacing={4}>
             <Heading size="lg" textAlign="center" mb="1rem">Atualizar Música</Heading>
@@ -103,13 +103,13 @@ function Update({ fetchMusics, setLoading }) {
               <Input onChange={handleChange} name="linkYoutube" value={value.linkYoutube} type="url" placeholder="Link Youtube" />
             </HStack>
             <Divider />
-            <Text><b>Tom:</b> Alber / Lucymeire / Adolescentes</Text>
+            <Text><b>Tom:</b> Alber / Lucy Mary / Adolescentes</Text>
             <HStack spacing={4}>
               <Input onChange={handleChangeTom} name="sdn-alber" value={ministerios["sdn-alber"]} placeholder="Alber" />
-              <Input onChange={handleChangeTom} name="sdn-lucimeire" value={ministerios["sdn-lucimeire"]} placeholder="Lucymeire" />
+              <Input onChange={handleChangeTom} name="sdn-lucimeire" value={ministerios["sdn-lucimeire"]} placeholder="Lucy Mary" />
               <Input onChange={handleChangeTom} name="adolescentes" value={ministerios.adolescentes} placeholder="Adolescentes" />
             </HStack>
-            <Text><b>Última vez tocada:</b> Alber / Lucymeire / Adolescentes</Text>
+            <Text><b>Última vez tocada:</b> Alber / Lucy Mary / Adolescentes</Text>
             <HStack spacing={4}>
               <Input size="sm" type="date" onChange={handleChangeLast} name="sdn-alber" value={lastPlayeds["sdn-alber"]} />
               <Input size="sm" type="date" onChange={handleChangeLast} name="sdn-lucimeire" value={lastPlayeds["sdn-lucimeire"]} />
