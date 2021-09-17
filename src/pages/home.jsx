@@ -11,8 +11,9 @@ import { useEffect } from "react"
 import { useState } from "react"
 import ListMusics from "../components/listMusics"
 
-function Home({ musics, events, setEventMusics, fetchMusics }) {
+function Home({ musics, events, setEventMusics, setMusics, fetchMusics }) {
   const [search, setSearch] = useState("")
+  const [genderFilter, setGenderFilter] = useState("")
   const [filteredMusics, setFilteredMusics] = useState(musics)
 
   useEffect(() => {
@@ -21,10 +22,12 @@ function Home({ musics, events, setEventMusics, fetchMusics }) {
     const filtered = musics.filter(music =>
       music.name.toLowerCase().includes(searchString) ||
       music.author.toLowerCase().includes(searchString)
+    ).filter(music =>
+      genderFilter === "" ? true : music.gender === genderFilter
     )
 
     setFilteredMusics(filtered)
-  }, [search, musics])
+  }, [search, musics, genderFilter])
 
   const handleSearch = (e) => {
     setSearch(e.target.value)
@@ -49,7 +52,7 @@ function Home({ musics, events, setEventMusics, fetchMusics }) {
 
       <Divider />
 
-      <ListMusics musics={filteredMusics} search={search} handleSearch={handleSearch} title="Todas Músicas" setEventMusics={setEventMusics} />
+      <ListMusics setMusics={setMusics} setGenderFilter={setGenderFilter} genderFilter={genderFilter} allMusics={musics} musics={filteredMusics} search={search} handleSearch={handleSearch} title="Todas Músicas" setEventMusics={setEventMusics} />
 
       {/* {useMediaQuery("(min-width: 1000px)")[0] ? (
         <TableMusics musics={musics} title="Todas Músicas" ministerio="all" />

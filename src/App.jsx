@@ -25,7 +25,8 @@ function App() {
       ministerio: "",
       lastPlayed: "",
       tom: "",
-    }]
+    }],
+    selected: true
   }
   const [musics, setMusics] = useState([musicsTemplate])
   const [events, setEvents] = useState([{
@@ -45,7 +46,7 @@ function App() {
     setLoading(true)
     await api.get("/music")
       .then(async res => {
-        setMusics(res.data)
+        setMusics(res.data.map(music => ({ ...music, selected: false })))
         await api.get("/event")
           .then(res => {
             setEvents(res.data)
@@ -73,7 +74,7 @@ function App() {
           <CreateList eventMusics={eventMusics} fetchMusics={fetchMusics} />
         </Route>
         <Route path="/">
-          <Home fetchMusics={fetchMusics} musics={musics} events={events} setEventMusics={setEventMusics} />
+          <Home fetchMusics={fetchMusics} musics={musics} events={events} setMusics={setMusics} setEventMusics={setEventMusics} />
         </Route>
       </Switch>
     </Router>

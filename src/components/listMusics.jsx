@@ -21,25 +21,23 @@ import {
   Input,
   useMediaQuery,
   Checkbox,
+  Select,
+  FormControl,
+  FormLabel,
+  FormHelperText,
 } from "@chakra-ui/react"
 import {
-  AddIcon, CalendarIcon, CheckIcon, DeleteIcon, EditIcon, ExternalLinkIcon, SearchIcon
+  AddIcon, CalendarIcon, CheckIcon, CloseIcon, DeleteIcon, EditIcon, ExternalLinkIcon, SearchIcon
 } from "@chakra-ui/icons"
-import { useState } from "react"
-import { ministeriosNames } from "../service/definitions"
+import { genders, ministeriosNames } from "../service/definitions"
 import { addDays } from "date-fns/esm"
 import api from "../service/api"
 
-function ListMusics({ musics, title, isEvent, event, setEventMusics, fetchMusics, search, handleSearch }) {
-  const [list, setList] = useState({})
+function ListMusics({ musics, title, isEvent, setGenderFilter, genderFilter, event, setEventMusics, setMusics, fetchMusics, search, handleSearch, allMusics }) {
   const history = useHistory()
 
   const handleCreateList = () => {
-    let listIds = []
-    for (const [key, value] of Object.entries(list)) {
-      if (value) listIds.push(Number(key))
-    }
-    const listMusics = musics.flatMap(music => listIds.includes(music.id) ? [music] : [])
+    const listMusics = allMusics.filter(music => music.selected)
     setEventMusics(listMusics)
     history.push("/createlist")
   }
@@ -75,9 +73,10 @@ function ListMusics({ musics, title, isEvent, event, setEventMusics, fetchMusics
           search={search}
           handleSearch={handleSearch}
           handleCreateList={handleCreateList}
+          setGenderFilter={setGenderFilter}
           isEvent={isEvent}
           event={event}
-          haveList={Object.values(list).find(e => e)}
+          haveList={allMusics.map(m => m.selected).reduce((p, c) => p || c, false)}
         />
       )}
 
@@ -87,13 +86,23 @@ function ListMusics({ musics, title, isEvent, event, setEventMusics, fetchMusics
             music.ministeriosInfo.find(mi => mi.ministerio === name)
           )
           return (
-            <AccordionItem key={index}>
+            <AccordionItem key={music.id}>
               <h2>
                 <AccordionButton>
                   {!isEvent &&
                     <Checkbox pr="15px" size="lg" name={music.id}
-                      onChange={(e) => setList(prev => ({ ...prev, [e.target.name]: e.target.checked }))}
-                      isChecked={list[music.id]}
+                      onChange={(e) => {
+                        setMusics(prev => {
+                          const newMusics = prev
+                            .flatMap(c => {
+                              const tm = c.id === Number(e.target.name) ?
+                                { ...c, selected: !c.selected } : c;
+                              return tm
+                            })
+                          return newMusics
+                        })
+                      }}
+                      isChecked={music.selected}
                     />
                   }
                   <Text flex="1" textAlign="left" isTruncated>
@@ -108,7 +117,7 @@ function ListMusics({ musics, title, isEvent, event, setEventMusics, fetchMusics
                     {["Música", "Artista", "Gênero"].map(head => (
                       <Text key={head}><b>{head}</b></Text>
                     ))}
-                    {ministeriosNames.map(head => (
+                    {ministeriosNames.map((head) => (
                       <Text isTruncated key={head}><b>- {head}</b></Text>
                     ))}
                     {["CifraClub", "Youtube"].map(head => (
@@ -117,8 +126,8 @@ function ListMusics({ musics, title, isEvent, event, setEventMusics, fetchMusics
                   </VStack>
 
                   <VStack flex="1" align="left" pl="1.5rem">
-                    {[music.name, music.author, music.gender].map(value => (
-                      <Text key={value} isTruncated>{value}</Text>
+                    {[music.name, music.author, music.gender].map((value, index) => (
+                      <Text key={index} isTruncated>{value}</Text>
                     ))}
 
                     {ministerios.map(value => (
@@ -159,7 +168,7 @@ function ListMusics({ musics, title, isEvent, event, setEventMusics, fetchMusics
   )
 }
 
-function Header({ title, search, handleSearch, isEvent, event, haveList, handleCreateList }) {
+function Header({ title, search, handleSearch, setGenderFilter, genderFilter, isEvent, event, haveList, handleCreateList }) {
   return (
     <VStack spacing={5} mb="0px" p="20px" align="left" >
       <Flex align="flex-end">
@@ -182,9 +191,20 @@ function Header({ title, search, handleSearch, isEvent, event, haveList, handleC
       </Flex>
 
       <InputGroup>
-        <InputRightElement children={<SearchIcon />} />
+        <InputRightElement children={search === "" ? <SearchIcon /> : (
+          <IconButton icon={<CloseIcon />} variant="ghost" onClick={() => handleSearch({ target: { value: "" } })} />
+        )} />
         <Input value={search} onChange={handleSearch} borderColor="blue.500" border="1px" variant="filled" bg="white" placeholder="Pesquisar por música ou artista" />
       </InputGroup>
+
+      <FormControl>
+        <Select bg="white" variant="outline" borderColor="blue.500" onChange={(e) => setGenderFilter(e.target.value)} value={genderFilter}>
+          <option value="">Todos gêneros</option>
+          {genders.map(name => (
+            <option value={name}>{name}</option>
+          ))}
+        </Select>
+      </FormControl>
     </VStack >
   )
 }
