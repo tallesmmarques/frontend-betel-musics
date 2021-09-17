@@ -1,5 +1,5 @@
-import { Link as ReactLink } from "react-router-dom"
-import { differenceInDays, formatDistanceToNow } from "date-fns"
+import { Link as ReactLink, useHistory } from "react-router-dom"
+import { format, differenceInDays, formatDistanceToNow } from "date-fns"
 import { ptBR } from "date-fns/locale"
 import {
   Box,
@@ -20,29 +20,70 @@ import {
   InputRightElement,
   Input,
   useMediaQuery,
+  Checkbox,
 } from "@chakra-ui/react"
 import {
-  AddIcon, EditIcon, ExternalLinkIcon, SearchIcon
+  AddIcon, CalendarIcon, CheckIcon, DeleteIcon, EditIcon, ExternalLinkIcon, SearchIcon
 } from "@chakra-ui/icons"
 import { useState } from "react"
 import { ministeriosNames } from "../service/definitions"
+import { addDays } from "date-fns/esm"
+import api from "../service/api"
 
-function ListMusics({ musics, title, isEvent, event }) {
+function ListMusics({ musics, title, isEvent, event, setEventMusics, fetchMusics }) {
   const [search, setSearch] = useState("")
+  const [list, setList] = useState({})
+  const history = useHistory()
 
   const handleSearch = (e) => {
     setSearch(e.target.value)
   }
+  const handleCreateList = () => {
+    let listIds = []
+    for (const [key, value] of Object.entries(list)) {
+      if (value) listIds.push(Number(key))
+    }
+    const listMusics = musics.flatMap(music => listIds.includes(music.id) ? [music] : [])
+    setEventMusics(listMusics)
+    history.push("/createlist")
+  }
+  const handlePlayed = async () => {
+    api.put("/music")
+
+    event.musics.forEach(async music => {
+      await api.put(`/music/${music.id}/${event.ministerio}`, {
+        lastPlayed: event.date
+      }).then(res => {
+        fetchMusics()
+      }).catch(err => console.log(err))
+    })
+
+    handleDelete()
+  }
+
+  const handleDelete = async () => {
+    await api.delete(`/event/${event.id}`).then(res => {
+      fetchMusics()
+    })
+  }
 
   return (
     <Box py="20px">
-      <Header
-        title={title}
-        search={search}
-        handleSearch={handleSearch}
-        isEvent={isEvent}
-        event={event}
-      />
+      {isEvent ? (
+        <HeaderEvent
+          event={event}
+        />
+      ) : (
+        <Header
+          title={title}
+          search={search}
+          handleSearch={handleSearch}
+          handleCreateList={handleCreateList}
+          isEvent={isEvent}
+          event={event}
+          haveList={Object.values(list).find(e => e)}
+        />
+      )}
 
       <Accordion allowToggle mx="0px" bg="white">
         {(isEvent ? event.musics : musics).map((music, index) => {
@@ -53,6 +94,12 @@ function ListMusics({ musics, title, isEvent, event }) {
             <AccordionItem key={index}>
               <h2>
                 <AccordionButton>
+                  {!isEvent &&
+                    <Checkbox pr="15px" size="lg" name={music.id}
+                      onChange={(e) => setList(prev => ({ ...prev, [e.target.name]: e.target.checked }))}
+                      isChecked={list[music.id]}
+                    />
+                  }
                   <Text flex="1" textAlign="left" isTruncated>
                     <b>{music.name}</b> - {music.author}
                   </Text>
@@ -105,39 +152,54 @@ function ListMusics({ musics, title, isEvent, event }) {
           )
         })}
       </Accordion >
+
+      {isEvent && (
+        <Flex mt="10px" px="20px" justifyContent="flex-end">
+          <Button colorScheme="yellow" variant="solid" onClick={handlePlayed}>Tocada <CheckIcon ml="10px" /> </Button>
+          <Button colorScheme="red" variant="solid" ml="10px" onClick={handleDelete}>Remover <DeleteIcon ml="10px" /> </Button>
+        </Flex>
+      )}
     </Box >
   )
 }
 
-function Header({ title, search, handleSearch, isEvent, event }) {
-  const isSmall = useMediaQuery("(min-width: 400px)")[0]
+function Header({ title, search, handleSearch, isEvent, event, haveList, handleCreateList }) {
   return (
     <VStack spacing={5} mb="0px" p="20px" align="left" >
-      <Flex>
-        {isEvent ?
-          <Heading size="md" textTransform="initial" flex="1">{event.ministerio} - {event.title}</Heading>
-          :
-          <Heading size="lg" textTransform="capitalize" flex="1">{title}</Heading>
+      <Flex align="flex-end">
+        <Heading size="lg" textTransform="capitalize" flex="1">{title}</Heading>
+
+        {haveList &&
+          <IconButton colorScheme="green"
+            variant="solid" onClick={handleCreateList}
+            icon={<CalendarIcon />}
+          />
         }
 
-        {!isEvent && (
-          !isSmall ? (
-            <IconButton colorScheme="blue" variant="solid" as={ReactLink} to="/create" icon={<AddIcon />} />
-          ) : (
-            <Button colorScheme="blue" variant="solid" as={ReactLink} to="/create">
-              <AddIcon mr="10px" /> Criar Música
-            </Button>
-          )
+        {useMediaQuery("(min-width: 380px)")[0] ? (
+          <Button ml="10px" colorScheme="blue" variant="solid" as={ReactLink} to="/create">
+            <AddIcon mr="10px" /> Criar Música
+          </Button>
+        ) : (
+          <IconButton colorScheme="blue" variant="solid" as={ReactLink} to="/create" icon={<AddIcon />} />
         )}
       </Flex>
 
-      {
-        !isEvent &&
-        <InputGroup>
-          <InputRightElement children={<SearchIcon />} />
-          <Input value={search} onChange={handleSearch} borderColor="blue.500" border="1px" variant="filled" bg="white" placeholder="Pesquisar por música ou artista" />
-        </InputGroup>
-      }
+      <InputGroup>
+        <InputRightElement children={<SearchIcon />} />
+        <Input value={search} onChange={handleSearch} borderColor="blue.500" border="1px" variant="filled" bg="white" placeholder="Pesquisar por música ou artista" />
+      </InputGroup>
+    </VStack >
+  )
+}
+
+function HeaderEvent({ event }) {
+  return (
+    <VStack spacing={5} p="20px" pb="10px" align="flex-start" >
+      <Flex align="flex-start" direction="column">
+        <Heading size="md" textTransform="initial">{event.ministerio} - {event.title}</Heading>
+        <Text>{format(addDays(new Date(event.date), 1), "PPPP", { locale: ptBR })}</Text>
+      </Flex>
     </VStack >
   )
 }

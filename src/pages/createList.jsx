@@ -1,29 +1,23 @@
-import { AddIcon } from "@chakra-ui/icons"
-import { Box, Button, Center, FormControl, FormLabel, Heading, HStack, Input, Select, Stack, IconButton, Text } from "@chakra-ui/react"
+import { Box, Button, Center, FormControl, FormLabel, Heading, HStack, Input, Select, Stack, ListItem, UnorderedList } from "@chakra-ui/react"
 import { useState } from "react"
 import { useHistory } from "react-router-dom"
 import api from "../service/api"
 import { ministeriosNames } from "../service/definitions"
 
-function CreateList({ fetchMusics, musicsData }) {
+function CreateList({ fetchMusics, eventMusics }) {
   const [value, setValue] = useState({
     title: "",
     ministerio: "",
     date: ""
   })
-  const [musics, setMusics] = useState([{ id: 0 }])
-  const [selMusic, setSelMusic] = useState()
   const history = useHistory()
 
   const handleChange = (e) => {
     setValue(prev => ({ ...prev, [e.target.name]: e.target.value }))
   }
-  const handleChangeSelMusic = (e) => {
-    setSelMusic(e.target.value)
-  }
   const handleSubmit = (e) => {
     e.preventDefault()
-    api.post("/event", { ...value, musics }).then(res => {
+    api.post("/event", { ...value, musics: eventMusics }).then(res => {
       fetchMusics()
       history.push("/")
     }).catch(err => console.log(err))
@@ -54,22 +48,12 @@ function CreateList({ fetchMusics, musicsData }) {
               <Input type="date" onChange={handleChange} name="date" value={value.date} placeholder="Dia do evento" isRequired />
             </FormControl>
 
-            <FormControl>
-              <FormLabel>Adicionar Músicas</FormLabel>
-              <HStack spacing={4} >
-                <Select onChange={handleChangeSelMusic} name="selmusic" value={selMusic} placeholder="Selecionar uma música" isRequired>
-                  {musicsData
-                    .map(music => (
-                      <option key={music.id} value={music.id}>{music.name} - {music.author}</option>
-                    ))}
-                </Select>
-                <IconButton onClick={() => setMusics(prev => [...prev, selMusic])} colorScheme="gray" variant="solid" icon={<AddIcon />} />
-              </HStack>
-            </FormControl>
-
-            {musics.map(music => (
-              <Text>{music.name} - {music.author}</Text>
-            ))}
+            <Heading size="md" pt="20px">Músicas adicionadas:</Heading>
+            <UnorderedList pl="10px">
+              {eventMusics.map(music =>
+                <ListItem m="10px" key={music.id}>{music.name} - {music.author}</ListItem>
+              )}
+            </UnorderedList>
 
             <HStack spacing={4} pt={5}>
               <Button variant="outline" flex="1" colorScheme="blue" onClick={() => history.push("/")}>Cancelar</Button>

@@ -1,5 +1,3 @@
-import { AddIcon } from "@chakra-ui/icons"
-import { Link as ReactLink } from "react-router-dom"
 import {
   Box,
   Text,
@@ -8,13 +6,10 @@ import {
   Image,
   useMediaQuery,
   Divider,
-  Button,
 } from "@chakra-ui/react"
-// import TableMusics from "../components/tableMusics"
 import ListMusics from "../components/listMusics"
 
-function Home({ musics, events }) {
-
+function Home({ musics, events, setEventMusics, fetchMusics }) {
   return (
     <Flex bg="#f3f4f5" minH="100vh" maxW="100vw" w="100%" flexDirection="column">
 
@@ -28,19 +23,13 @@ function Home({ musics, events }) {
         </Flex>
       </Box>
 
-      {/* <Heading p="20px" pb="0" pt="30px">Mural de Eventos</Heading> */}
-
-      <Button colorScheme="blue" m="20px" mb="0" variant="solid" as={ReactLink} to="/createlist">
-        <AddIcon mr="10px" /> Criar Lista
-      </Button>
-
       {events.map(event =>
-        <ListMusics key="event.id" event={event} isEvent />
+        <ListMusics key={event.id} fetchMusics={fetchMusics} event={event} isEvent setEventMusics={setEventMusics} />
       )}
 
       <Divider />
 
-      <ListMusics musics={musics} title="Todas Músicas" />
+      <ListMusics musics={musics} title="Todas Músicas" setEventMusics={setEventMusics} />
 
       {/* {useMediaQuery("(min-width: 1000px)")[0] ? (
         <TableMusics musics={musics} title="Todas Músicas" ministerio="all" />

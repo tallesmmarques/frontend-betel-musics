@@ -35,12 +35,14 @@ function App() {
     musics: musicsTemplate
   }])
   const [loading, setLoading] = useState(true)
+  const [eventMusics, setEventMusics] = useState([{}])
 
   useEffect(() => {
     fetchMusics()
   }, [])
 
   const fetchMusics = async () => {
+    setLoading(true)
     await api.get("/music")
       .then(async res => {
         setMusics(res.data)
@@ -68,10 +70,10 @@ function App() {
           <Update fetchMusics={fetchMusics} />
         </Route>
         <Route path="/createlist">
-          <CreateList musicsData={musics} fetchMusics={fetchMusics} />
+          <CreateList eventMusics={eventMusics} fetchMusics={fetchMusics} />
         </Route>
         <Route path="/">
-          <Home musics={musics} events={events} />
+          <Home fetchMusics={fetchMusics} musics={musics} events={events} setEventMusics={setEventMusics} />
         </Route>
       </Switch>
     </Router>
