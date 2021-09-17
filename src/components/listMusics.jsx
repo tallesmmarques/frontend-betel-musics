@@ -23,8 +23,8 @@ import {
   Checkbox,
   Select,
   FormControl,
-  FormLabel,
-  FormHelperText,
+  ListItem,
+  UnorderedList,
 } from "@chakra-ui/react"
 import {
   AddIcon, CalendarIcon, CheckIcon, CloseIcon, DeleteIcon, EditIcon, ExternalLinkIcon, SearchIcon
@@ -32,9 +32,15 @@ import {
 import { genders, ministeriosNames } from "../service/definitions"
 import { addDays } from "date-fns/esm"
 import api from "../service/api"
+import { useRef } from "react"
+import { useState } from "react"
+import Dialog from "./dialog"
 
-function ListMusics({ musics, title, isEvent, setGenderFilter, genderFilter, event, setEventMusics, setMusics, fetchMusics, search, handleSearch, allMusics }) {
+function ListMusics({ musics, title, isEvent, setGenderFilter, event, setEventMusics, setMusics, setEvents, fetchMusics, search, handleSearch, allMusics }) {
   const history = useHistory()
+  const [isOpen, setIsOpen] = useState("")
+  const onClose = () => setIsOpen("")
+  const cancelRef = useRef()
 
   const handleCreateList = () => {
     const listMusics = allMusics.filter(music => music.selected)
@@ -44,20 +50,35 @@ function ListMusics({ musics, title, isEvent, setGenderFilter, genderFilter, eve
   const handlePlayed = async () => {
     api.put("/music")
 
-    event.musics.forEach(async music => {
-      await api.put(`/music/${music.id}/${event.ministerio}`, {
-        lastPlayed: event.date
-      }).then(res => {
-        fetchMusics()
-      }).catch(err => console.log(err))
-    })
+    event.musics
+      .filter(music => music.selected)
+      .forEach(async music => {
+        await api.put(`/music/${music.id}/${event.ministerio}`, {
+          lastPlayed: event.date
+        }).then(res => {
+          fetchMusics()
+        }).catch(err => console.log(err))
+      })
 
     handleDelete()
   }
-
   const handleDelete = async () => {
     await api.delete(`/event/${event.id}`).then(res => {
       fetchMusics()
+    })
+  }
+  const handleChangeEventsMusics = (e) => {
+    setEvents(prev => {
+      const newEvents = prev
+        .map(ev => ev.id === event.id ? (
+          {
+            ...ev, musics: ev.musics
+              .map(ms => ms.id === Number(e.target.name) ? (
+                { ...ms, selected: !ms.selected }
+              ) : ms)
+          }
+        ) : ev)
+      return newEvents
     })
   }
 
@@ -81,7 +102,7 @@ function ListMusics({ musics, title, isEvent, setGenderFilter, genderFilter, eve
       )}
 
       <Accordion allowToggle mx="0px" bg="white">
-        {(isEvent ? event.musics : musics).map((music, index) => {
+        {(isEvent ? event.musics : musics).map((music) => {
           const ministerios = ministeriosNames.map(name =>
             music.ministeriosInfo.find(mi => mi.ministerio === name)
           )
@@ -89,7 +110,7 @@ function ListMusics({ musics, title, isEvent, setGenderFilter, genderFilter, eve
             <AccordionItem key={music.id}>
               <h2>
                 <AccordionButton>
-                  {!isEvent &&
+                  {!isEvent ?
                     <Checkbox pr="15px" size="lg" name={music.id}
                       onChange={(e) => {
                         setMusics(prev => {
@@ -102,6 +123,10 @@ function ListMusics({ musics, title, isEvent, setGenderFilter, genderFilter, eve
                           return newMusics
                         })
                       }}
+                      isChecked={music.selected}
+                    /> :
+                    <Checkbox pr="15px" size="lg" name={music.id}
+                      onChange={handleChangeEventsMusics}
                       isChecked={music.selected}
                     />
                   }
@@ -135,8 +160,8 @@ function ListMusics({ musics, title, isEvent, setGenderFilter, genderFilter, eve
                         <Badge textTransform="none" colorScheme="purple">{value?.tom ? `tom ${value?.tom}` : "nenhum Tom"}</Badge>
                         <Badge textTransform="none" colorScheme={
                           value?.lastPlayed ? (
-                            differenceInDays(new Date(), new Date(value?.lastPlayed)) <= 7 ? "red" : (
-                              differenceInDays(new Date(), new Date(value?.lastPlayed)) <= 14 ? "orange" : "green"
+                            differenceInDays(new Date(), addDays(new Date(value?.lastPlayed), 1)) <= 7 ? "red" : (
+                              differenceInDays(new Date(), addDays(new Date(value?.lastPlayed), 1)) <= 14 ? "orange" : "green"
                             )) : "blue"
                         } ml="2">{
                             value?.lastPlayed ? `tocada há ${formatDistanceToNow(new Date(value?.lastPlayed), { locale: ptBR })}` : "não tocada"
@@ -160,10 +185,43 @@ function ListMusics({ musics, title, isEvent, setGenderFilter, genderFilter, eve
 
       {isEvent && (
         <Flex mt="10px" px="20px" justifyContent="flex-end">
-          <Button colorScheme="yellow" variant="solid" onClick={handlePlayed}>Tocada <CheckIcon ml="10px" /> </Button>
-          <Button colorScheme="red" variant="solid" ml="10px" onClick={handleDelete}>Remover <DeleteIcon ml="10px" /> </Button>
+          <Button colorScheme="yellow" variant="solid" onClick={() => setIsOpen("tocada")}>Tocada <CheckIcon ml="10px" /> </Button>
+          <Button colorScheme="red" variant="solid" ml="10px" onClick={() => setIsOpen("delete")}>Remover <DeleteIcon ml="10px" /> </Button>
         </Flex>
       )}
+
+      <Dialog
+        action={handlePlayed}
+        header="Encerrar Evento"
+        body={(
+          <Flex flexDirection="column">
+            <Text fontWeight="bold">As datas das seguintes músicas seram atualizadas:</Text>
+            <UnorderedList py="10px" pl="10px">
+              {isEvent && event.musics
+                .filter(music => music.selected)
+                .map(music =>
+                  <ListItem color="blue.700">{music.name}</ListItem>
+                )}
+            </UnorderedList>
+            <Text>Caso não tenho tocado alguma destas, basta desmarcar a caixinha ao lado da música</Text>
+          </Flex>
+        )}
+        cancelRef={cancelRef}
+        colorScheme="green"
+        isOpen={isOpen === "tocada"}
+        onClose={onClose}
+        actionText="Confirmar"
+      />
+      <Dialog
+        action={handleDelete}
+        header="Apagar Evento"
+        body="Tem certeza? Você não pode desfazer esta ação depois."
+        cancelRef={cancelRef}
+        colorScheme="red"
+        isOpen={isOpen === "delete"}
+        onClose={onClose}
+        actionText="Apagar"
+      />
     </Box >
   )
 }

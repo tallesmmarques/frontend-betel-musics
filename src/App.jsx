@@ -49,7 +49,10 @@ function App() {
         setMusics(res.data.map(music => ({ ...music, selected: false })))
         await api.get("/event")
           .then(res => {
-            setEvents(res.data)
+            setEvents(res.data.map(event => {
+              const musicsSel = event.musics.map(m => ({ ...m, selected: true }))
+              return ({ ...event, musics: musicsSel })
+            }))
             setLoading(false)
           })
           .catch(err => console.error(err))
@@ -74,7 +77,14 @@ function App() {
           <CreateList eventMusics={eventMusics} fetchMusics={fetchMusics} />
         </Route>
         <Route path="/">
-          <Home fetchMusics={fetchMusics} musics={musics} events={events} setMusics={setMusics} setEventMusics={setEventMusics} />
+          <Home
+            fetchMusics={fetchMusics}
+            musics={musics}
+            events={events}
+            setMusics={setMusics}
+            setEventMusics={setEventMusics}
+            setEvents={setEvents}
+          />
         </Route>
       </Switch>
     </Router>

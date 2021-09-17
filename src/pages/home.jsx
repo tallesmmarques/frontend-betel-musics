@@ -11,7 +11,7 @@ import { useEffect } from "react"
 import { useState } from "react"
 import ListMusics from "../components/listMusics"
 
-function Home({ musics, events, setEventMusics, setMusics, fetchMusics }) {
+function Home({ musics, events, setEventMusics, setEvents, setMusics, fetchMusics }) {
   const [search, setSearch] = useState("")
   const [genderFilter, setGenderFilter] = useState("")
   const [filteredMusics, setFilteredMusics] = useState(musics)
@@ -47,7 +47,7 @@ function Home({ musics, events, setEventMusics, setMusics, fetchMusics }) {
       </Box>
 
       {events.map(event =>
-        <ListMusics key={event.id} fetchMusics={fetchMusics} event={event} isEvent setEventMusics={setEventMusics} />
+        <ListMusics key={event.id} fetchMusics={fetchMusics} setEvents={setEvents} event={event} isEvent setEventMusics={setEventMusics} />
       )}
 
       <Divider />
