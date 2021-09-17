@@ -11,6 +11,7 @@ import Home from "./pages/home"
 import Create from "./pages/create";
 import Update from "./pages/update";
 import CreateList from "./pages/createList";
+import UpdateList from "./pages/updateList";
 
 function App() {
   const musicsTemplate = {
@@ -75,6 +76,9 @@ function App() {
         </Route>
         <Route path="/createlist">
           <CreateList eventMusics={eventMusics} fetchMusics={fetchMusics} />
+        </Route>
+        <Route path="/updatelist/:id">
+          <UpdateList eventMusics={eventMusics} fetchMusics={fetchMusics} />
         </Route>
         <Route path="/">
           <Home

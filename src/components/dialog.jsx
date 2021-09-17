@@ -14,6 +14,7 @@ function Dialog({ isOpen, cancelRef, onClose, header, body, action, actionText, 
       isOpen={isOpen}
       leastDestructiveRef={cancelRef}
       onClose={onClose}
+      isCentralized
     >
       <AlertDialogOverlay>
         <AlertDialogContent>

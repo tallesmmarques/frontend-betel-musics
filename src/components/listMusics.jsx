@@ -27,7 +27,7 @@ import {
   UnorderedList,
 } from "@chakra-ui/react"
 import {
-  AddIcon, CalendarIcon, CheckIcon, CloseIcon, DeleteIcon, EditIcon, ExternalLinkIcon, SearchIcon
+  AddIcon, CalendarIcon, CheckIcon, CloseIcon, EditIcon, ExternalLinkIcon, SearchIcon
 } from "@chakra-ui/icons"
 import { genders, ministeriosNames } from "../service/definitions"
 import { addDays } from "date-fns/esm"
@@ -35,21 +35,23 @@ import api from "../service/api"
 import { useRef } from "react"
 import { useState } from "react"
 import Dialog from "./dialog"
+import { useEffect } from "react"
 
 function ListMusics({ musics, title, isEvent, setGenderFilter, event, setEventMusics, setMusics, setEvents, fetchMusics, search, handleSearch, allMusics }) {
   const history = useHistory()
-  const [isOpen, setIsOpen] = useState("")
-  const onClose = () => setIsOpen("")
+  const [isOpen, setIsOpen] = useState()
+  const onClose = () => setIsOpen()
   const cancelRef = useRef()
 
-  const handleCreateList = () => {
+  useEffect(() => {
     const listMusics = allMusics.filter(music => music.selected)
     setEventMusics(listMusics)
+  }, [allMusics, setEventMusics])
+
+  const handleCreateList = () => {
     history.push("/createlist")
   }
   const handlePlayed = async () => {
-    api.put("/music")
-
     event.musics
       .filter(music => music.selected)
       .forEach(async music => {
@@ -82,6 +84,8 @@ function ListMusics({ musics, title, isEvent, setGenderFilter, event, setEventMu
     })
   }
 
+  const haveList = allMusics.map(m => m.selected).reduce((p, c) => p || c, false)
+
   return (
     <Box py="20px">
       {isEvent ? (
@@ -97,7 +101,7 @@ function ListMusics({ musics, title, isEvent, setGenderFilter, event, setEventMu
           setGenderFilter={setGenderFilter}
           isEvent={isEvent}
           event={event}
-          haveList={allMusics.map(m => m.selected).reduce((p, c) => p || c, false)}
+          haveList={haveList}
         />
       )}
 
@@ -185,8 +189,8 @@ function ListMusics({ musics, title, isEvent, setGenderFilter, event, setEventMu
 
       {isEvent && (
         <Flex mt="10px" px="20px" justifyContent="flex-end">
-          <Button colorScheme="yellow" variant="solid" onClick={() => setIsOpen("tocada")}>Tocada <CheckIcon ml="10px" /> </Button>
-          <Button colorScheme="red" variant="solid" ml="10px" onClick={() => setIsOpen("delete")}>Remover <DeleteIcon ml="10px" /> </Button>
+          <Button colorScheme="orange" variant="solid" onClick={() => setIsOpen(true)}>Tocada <CheckIcon ml="10px" /> </Button>
+          <Button colorScheme={haveList ? "yellow" : "green"} variant="solid" ml="10px" onClick={() => history.push(`/updatelist/${event.id}`)}>Editar <EditIcon ml="10px" /> </Button>
         </Flex>
       )}
 
@@ -208,19 +212,9 @@ function ListMusics({ musics, title, isEvent, setGenderFilter, event, setEventMu
         )}
         cancelRef={cancelRef}
         colorScheme="green"
-        isOpen={isOpen === "tocada"}
+        isOpen={isOpen}
         onClose={onClose}
         actionText="Confirmar"
-      />
-      <Dialog
-        action={handleDelete}
-        header="Apagar Evento"
-        body="Tem certeza? Você não pode desfazer esta ação depois."
-        cancelRef={cancelRef}
-        colorScheme="red"
-        isOpen={isOpen === "delete"}
-        onClose={onClose}
-        actionText="Apagar"
       />
     </Box >
   )
@@ -244,7 +238,7 @@ function Header({ title, search, handleSearch, setGenderFilter, genderFilter, is
             <AddIcon mr="10px" /> Criar Música
           </Button>
         ) : (
-          <IconButton colorScheme="blue" variant="solid" as={ReactLink} to="/create" icon={<AddIcon />} />
+          <IconButton colorScheme="blue" ml="10px" variant="solid" as={ReactLink} to="/create" icon={<AddIcon />} />
         )}
       </Flex>
 

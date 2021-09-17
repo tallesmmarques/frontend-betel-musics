@@ -47,7 +47,7 @@ function Home({ musics, events, setEventMusics, setEvents, setMusics, fetchMusic
       </Box>
 
       {events.map(event =>
-        <ListMusics key={event.id} fetchMusics={fetchMusics} setEvents={setEvents} event={event} isEvent setEventMusics={setEventMusics} />
+        <ListMusics key={event.id} fetchMusics={fetchMusics} setEvents={setEvents} event={event} allMusics={musics} isEvent setEventMusics={setEventMusics} />
       )}
 
       <Divider />
