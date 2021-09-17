@@ -253,7 +253,7 @@ function Header({ title, search, handleSearch, setGenderFilter, genderFilter, is
         <Select bg="white" variant="outline" borderColor="blue.500" onChange={(e) => setGenderFilter(e.target.value)} value={genderFilter}>
           <option value="">Todos gêneros</option>
           {genders.map(name => (
-            <option value={name}>{name}</option>
+            <option key={name} value={name}>{name}</option>
           ))}
         </Select>
       </FormControl>

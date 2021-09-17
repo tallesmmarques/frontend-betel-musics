@@ -47,12 +47,31 @@ function Home({ musics, events, setEventMusics, setEvents, setMusics, fetchMusic
       </Box>
 
       {events.map(event =>
-        <ListMusics key={event.id} fetchMusics={fetchMusics} setEvents={setEvents} event={event} allMusics={musics} isEvent setEventMusics={setEventMusics} />
+        <ListMusics
+          key={event.id}
+          fetchMusics={fetchMusics}
+          setEvents={setEvents}
+          event={event}
+          allMusics={musics}
+          isEvent
+          setEventMusics={setEventMusics}
+        />
       )}
 
       <Divider />
 
-      <ListMusics setMusics={setMusics} setGenderFilter={setGenderFilter} genderFilter={genderFilter} allMusics={musics} musics={filteredMusics} search={search} handleSearch={handleSearch} title="Todas Músicas" setEventMusics={setEventMusics} />
+      <ListMusics
+        setMusics={setMusics}
+        setGenderFilter={setGenderFilter}
+        genderFilter={genderFilter}
+        allMusics={musics}
+        musics={filteredMusics}
+        search={search}
+        handleSearch={handleSearch}
+        title="Todas 
+        Músicas"
+        setEventMusics={setEventMusics}
+      />
 
       {/* {useMediaQuery("(min-width: 1000px)")[0] ? (
         <TableMusics musics={musics} title="Todas Músicas" ministerio="all" />
