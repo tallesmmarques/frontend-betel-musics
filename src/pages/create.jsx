@@ -2,9 +2,9 @@ import { Box, Button, Center, Divider, Heading, HStack, Input, Select, Stack, Te
 import { useState } from "react"
 import { useHistory } from "react-router-dom"
 import api from "../service/api"
+import { ministeriosNames, genders } from "../service/definitions"
 
 function Create({ fetchMusics }) {
-  const generos = ["Adoração", "Worship", "Corinho", "Comunhão"]
   const [value, setValue] = useState({
     name: "",
     author: "",
@@ -12,25 +12,22 @@ function Create({ fetchMusics }) {
     linkCifra: "",
     linkYoutube: ""
   })
-  const [ministerios, setMinisterios] = useState({
-    "sdn-alber": "",
-    "sdn-lucy": "",
-    adolescentes: ""
-  })
+  const [tons, setTons] = useState(
+    ministeriosNames.reduce((p, c) => ({ ...p, [c]: "" }))
+  )
   const history = useHistory()
 
   const handleChange = (e) => {
     setValue(prev => ({ ...prev, [e.target.name]: e.target.value }))
   }
   const handleChangeTom = (e) => {
-    setMinisterios(prev => ({ ...prev, [e.target.name]: e.target.value }))
+    setTons(prev => ({ ...prev, [e.target.name]: e.target.value }))
   }
   const handleSubmit = (e) => {
-    const ministeriosInfo = [
-      { ministerio: "sdn-alber", tom: ministerios["sdn-alber"] },
-      { ministerio: "sdn-lucy", tom: ministerios["sdn-lucy"] },
-      { ministerio: "adolescentes", tom: ministerios["adolescentes"] }
-    ]
+    const ministeriosInfo = ministeriosNames.map(name => ({
+      ministerio: name,
+      tom: tons[name]
+    }))
     e.preventDefault()
     api.post("/music", {
       ...value,
@@ -51,8 +48,8 @@ function Create({ fetchMusics }) {
             <Input onChange={handleChange} name="name" value={value.name} placeholder="Música" isRequired />
             <Input onChange={handleChange} name="author" value={value.author} placeholder="Artista" isRequired />
             <Select onChange={handleChange} name="gender" value={value.gender} placeholder="Selecione um Gênero" isRequired>
-              {generos.map(genero => (
-                <option key={genero} value={genero}>{genero}</option>
+              {genders.map(gender => (
+                <option key={gender} value={gender}>{gender}</option>
               ))}
             </Select>
             <HStack spacing={4}>
@@ -60,11 +57,11 @@ function Create({ fetchMusics }) {
               <Input onChange={handleChange} name="linkYoutube" value={value.linkYoutube} type="url" placeholder="Link Youtube" />
             </HStack>
             <Divider />
-            <Text><b>Tom:</b> Alber / Lucy Mary / Adolescentes</Text>
+            <Text><b>Tom:</b> {ministeriosNames.join(" / ")}</Text>
             <HStack spacing={4}>
-              <Input onChange={handleChangeTom} name="sdn-alber" value={ministerios["sdn-alber"]} placeholder="Alber" />
-              <Input onChange={handleChangeTom} name="sdn-lucy" value={ministerios["sdn-lucy"]} placeholder="Lucy Mary" />
-              <Input onChange={handleChangeTom} name="adolescentes" value={ministerios.adolescentes} placeholder="Adolescentes" />
+              {ministeriosNames.map(name => (
+                <Input key={name} onChange={handleChangeTom} name={name} value={tons[name]} placeholder={name} />
+              ))}
             </HStack>
             <HStack spacing={4} pt={5}>
               <Button variant="outline" flex="1" colorScheme="blue" onClick={() => history.push("/")}>Cancelar</Button>

@@ -10,9 +10,10 @@ import Loading from "./components/loading"
 import Home from "./pages/home"
 import Create from "./pages/create";
 import Update from "./pages/update";
+import CreateList from "./pages/createList";
 
 function App() {
-  const [musics, setMusics] = useState([{
+  const musicsTemplate = {
     id: 0,
     name: "",
     author: "",
@@ -25,6 +26,13 @@ function App() {
       lastPlayed: "",
       tom: "",
     }]
+  }
+  const [musics, setMusics] = useState([musicsTemplate])
+  const [events, setEvents] = useState([{
+    id: 0,
+    title: "",
+    ministerio: "",
+    musics: musicsTemplate
   }])
   const [loading, setLoading] = useState(true)
 
@@ -33,11 +41,15 @@ function App() {
   }, [])
 
   const fetchMusics = async () => {
-    setLoading(true)
     await api.get("/music")
-      .then(res => {
+      .then(async res => {
         setMusics(res.data)
-        setLoading(false)
+        await api.get("/event")
+          .then(res => {
+            setEvents(res.data)
+            setLoading(false)
+          })
+          .catch(err => console.error(err))
       })
       .catch(err => console.error(err))
   }
@@ -53,10 +65,13 @@ function App() {
           <Create fetchMusics={fetchMusics} />
         </Route>
         <Route path="/update/:id">
-          <Update fetchMusics={fetchMusics} setLoading={setLoading} />
+          <Update fetchMusics={fetchMusics} />
+        </Route>
+        <Route path="/createlist">
+          <CreateList musicsData={musics} fetchMusics={fetchMusics} />
         </Route>
         <Route path="/">
-          <Home musics={musics} />
+          <Home musics={musics} events={events} />
         </Route>
       </Switch>
     </Router>

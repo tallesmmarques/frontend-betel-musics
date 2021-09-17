@@ -15,13 +15,19 @@ import {
   Link,
   Badge,
   IconButton,
+  Heading,
+  InputGroup,
+  InputRightElement,
+  Input,
+  useMediaQuery,
 } from "@chakra-ui/react"
 import {
-  AddIcon, EditIcon, ExternalLinkIcon
+  AddIcon, EditIcon, ExternalLinkIcon, SearchIcon
 } from "@chakra-ui/icons"
 import { useState } from "react"
+import { ministeriosNames } from "../service/definitions"
 
-function TableMusics({ musics, title }) {
+function ListMusics({ musics, title, isEvent, event }) {
   const [search, setSearch] = useState("")
 
   const handleSearch = (e) => {
@@ -29,19 +35,20 @@ function TableMusics({ musics, title }) {
   }
 
   return (
-    <Box py="30px">
+    <Box py="20px">
       <Header
         title={title}
         search={search}
         handleSearch={handleSearch}
+        isEvent={isEvent}
+        event={event}
       />
 
-      {/* <Heading p="20px" size="lg" textTransform="capitalize">{title}</Heading> */}
       <Accordion allowToggle mx="0px" bg="white">
-        {musics.map((music, index) => {
-          const alber = music.ministeriosInfo.find(mi => mi.ministerio === "sdn-alber")
-          const lucymary = music.ministeriosInfo.find(mi => mi.ministerio === "sdn-lucy")
-          const adolescentes = music.ministeriosInfo.find(mi => mi.ministerio === "adolescentes")
+        {(isEvent ? event.musics : musics).map((music, index) => {
+          const ministerios = ministeriosNames.map(name =>
+            music.ministeriosInfo.find(mi => mi.ministerio === name)
+          )
           return (
             <AccordionItem key={index}>
               <h2>
@@ -58,7 +65,7 @@ function TableMusics({ musics, title }) {
                     {["Música", "Artista", "Gênero"].map(head => (
                       <Text key={head}><b>{head}</b></Text>
                     ))}
-                    {["Alber", "Lucy Mary", "Adolescentes"].map(head => (
+                    {ministeriosNames.map(head => (
                       <Text isTruncated key={head}><b>- {head}</b></Text>
                     ))}
                     {["CifraClub", "Youtube"].map(head => (
@@ -70,7 +77,8 @@ function TableMusics({ musics, title }) {
                     {[music.name, music.author, music.gender].map(value => (
                       <Text key={value} isTruncated>{value}</Text>
                     ))}
-                    {[alber, lucymary, adolescentes].map(value => (
+
+                    {ministerios.map(value => (
                       <Box h="1.5rem" key={value?.id} isTruncated>
                         <Badge textTransform="none" colorScheme="purple">{value?.tom ? `tom ${value?.tom}` : "nenhum Tom"}</Badge>
                         <Badge textTransform="none" colorScheme={
@@ -83,6 +91,7 @@ function TableMusics({ musics, title }) {
                           }</Badge>
                       </Box>
                     ))}
+
                     {[music?.linkCifra, music?.linkYoutube].map((value, index) => (
                       value !== "" ? (
                         <Link key={index} color="blue.500" textDecoration="underline" href={value} isExternal> Acessar Link < ExternalLinkIcon mx="2px" mb="2px" /></Link>
@@ -100,17 +109,37 @@ function TableMusics({ musics, title }) {
   )
 }
 
-function Header({ title, search, handleSearch }) {
+function Header({ title, search, handleSearch, isEvent, event }) {
+  const isSmall = useMediaQuery("(min-width: 400px)")[0]
   return (
-    <VStack spacing={5} mb="10px" p="20px" align="left" >
-      <Button colorScheme="blue" variant="solid" w="100%" as={ReactLink} to="/create"><AddIcon mr="10px" /> Criar Música</Button>
+    <VStack spacing={5} mb="0px" p="20px" align="left" >
+      <Flex>
+        {isEvent ?
+          <Heading size="md" textTransform="initial" flex="1">{event.ministerio} - {event.title}</Heading>
+          :
+          <Heading size="lg" textTransform="capitalize" flex="1">{title}</Heading>
+        }
 
-      {/* <InputGroup>
-        <InputRightElement children={<SearchIcon />} />
-        <Input value={search} onChange={handleSearch} borderColor="blue.500" border="1px" variant="filled" bg="white" placeholder="Pesquisar por música ou artista" />
-      </InputGroup> */}
-    </VStack>
+        {!isEvent && (
+          !isSmall ? (
+            <IconButton colorScheme="blue" variant="solid" as={ReactLink} to="/create" icon={<AddIcon />} />
+          ) : (
+            <Button colorScheme="blue" variant="solid" as={ReactLink} to="/create">
+              <AddIcon mr="10px" /> Criar Música
+            </Button>
+          )
+        )}
+      </Flex>
+
+      {
+        !isEvent &&
+        <InputGroup>
+          <InputRightElement children={<SearchIcon />} />
+          <Input value={search} onChange={handleSearch} borderColor="blue.500" border="1px" variant="filled" bg="white" placeholder="Pesquisar por música ou artista" />
+        </InputGroup>
+      }
+    </VStack >
   )
 }
 
-export default TableMusics
+export default ListMusics

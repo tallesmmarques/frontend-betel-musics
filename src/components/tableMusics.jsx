@@ -21,29 +21,20 @@ import {
   ExternalLinkIcon,
 } from "@chakra-ui/icons"
 import { useEffect, useState } from "react"
+import { ministeriosNames } from "../service/definitions"
+
+const prev = ["Música", "Artista", "Gênero"]
+const pos = ["CifraClub", "Youtube", ""]
 
 function TableMusics({ musics, title, ministerio }) {
   const [filter, setFilter] = useState("all")
-  const [tableh, setTableh] = useState(["Música", "Artista", "Gênero", "Alber", "Lucy Mary", "Adolescentes", "CifraClub", "Youtube", ""])
+  const [tableh, setTableh] = useState([...prev, ...ministeriosNames, ...pos])
 
   console.log()
 
   useEffect(() => {
-    switch (filter) {
-      case "sdn-alber":
-        setTableh(["Música", "Artista", "Gênero", "Alber", "Tocada há", "CifraClub", "Youtube", ""])
-        break;
-      case "sdn-lucy":
-        setTableh(["Música", "Artista", "Gênero", "Lucy Mary", "Tocada há", "CifraClub", "Youtube", ""])
-        break;
-      case "adolescentes":
-        setTableh(["Música", "Artista", "Gênero", "Adolescentes", "Tocada há", "CifraClub", "Youtube", ""])
-        break;
-
-      default:
-        setTableh(["Música", "Artista", "Gênero", "Alber", "Lucy Mary", "Adolescentes", "CifraClub", "Youtube", ""])
-        break;
-    }
+    const mid = filter === "all" ? ministeriosNames : ministeriosNames[filter]
+    setTableh([...prev, ...mid, ...pos])
   }, [filter])
 
   return (
@@ -66,10 +57,9 @@ function TableMusics({ musics, title, ministerio }) {
           </Thead>
           <Tbody>
             {musics.map(music => {
-              const tomAlber = music.ministeriosInfo.find(mi => mi.ministerio === "sdn-alber")
-              const tomLucy = music.ministeriosInfo.find(mi => mi.ministerio === "sdn-lucy")
-              const tomAdolescentes = music.ministeriosInfo.find(mi => mi.ministerio === "adolescentes")
-              const tom = { "sdn-alber": tomAlber, "sdn-lucy": tomLucy, "adolescentes": tomAdolescentes }
+              const tom = ministeriosNames.reduce((p, c) => ({
+                ...p, [c]: music.ministeriosInfo.find(mi => mi.ministerios === c)
+              }))
               const lastPlayed = tom[filter]?.lastPlayed ? new Date(tom[filter]?.lastPlayed) : null
 
               return (
@@ -77,8 +67,8 @@ function TableMusics({ musics, title, ministerio }) {
                   <Th textTransform="none" fontSize="14px" minW="200px" fontWeight="light" isTruncated>{music.name}</Th>
                   <Th textTransform="none" fontSize="14px" minW="200px" fontWeight="light" isTruncated>{music.author}</Th>
                   <Th textTransform="none" fontSize="14px" minW="100px" fontWeight="light" isTruncated>{music.gender}</Th>
-                  {filter === "all" && [tomAlber?.tom, tomLucy?.tom, tomAdolescentes?.tom].map((field, index) => (
-                    <Th key={index} textTransform="none" maxW="50px" fontSize="14px" fontWeight="light">{field}</Th>
+                  {filter === "all" && ministeriosNames.map((name) => (
+                    <Th key={name} textTransform="none" maxW="50px" fontSize="14px" fontWeight="light">{tom[name]}</Th>
                   ))}
                   {filter !== "all" && (
                     <Th textTransform="none" maxW="50px" fontSize="14px" fontWeight="light">{
@@ -123,14 +113,16 @@ function Header({ ministerio, title, filter, setFilter }) {
       {ministerio === "all" ?
         <Select w="150px" mr="1rem" onChange={(e) => setFilter(e.target.value)} value={filter}>
           <option value="all">Todos</option>
-          <option value="sdn-alber">Alber</option>
-          <option value="sdn-lucy">Lucy Mary</option>
-          <option value="adolescentes">Adolescentes</option>
+          {ministeriosNames.map(name => (
+            <option value={name}>{name}</option>
+          ))}
         </Select>
         : <></>}
 
       {ministerio === "all" ?
-        <Button colorScheme="blue" variant="solid" maxW="150px" as={ReactLink} to="/create"><AddIcon mr="10px" /> Criar Música</Button>
+        <Button colorScheme="blue" variant="solid" maxW="150px" as={ReactLink} to="/create">
+          <AddIcon mr="10px" /> Criar Música
+        </Button>
         : <></>}
     </Flex>
   )

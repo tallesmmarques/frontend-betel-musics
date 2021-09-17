@@ -3,9 +3,9 @@ import { DeleteIcon } from "@chakra-ui/icons"
 import { useEffect, useRef, useState } from "react"
 import { useHistory, useParams } from "react-router-dom"
 import api from "../service/api"
+import { genders, ministeriosNames } from "../service/definitions"
 
 function Update({ fetchMusics, setLoading }) {
-  const generos = ["Adoração", "Worship", "Corinho", "Comunhão"]
   const [value, setValue] = useState({
     name: "",
     author: "",
@@ -13,41 +13,34 @@ function Update({ fetchMusics, setLoading }) {
     linkCifra: "",
     linkYoutube: ""
   })
-  const [ministerios, setMinisterios] = useState({
-    "sdn-alber": "",
-    "sdn-lucy": "",
-    adolescentes: ""
-  })
-  const [lastPlayeds, setLastPlayeds] = useState({
-    "sdn-alber": "",
-    "sdn-lucy": "",
-    adolescentes: ""
-  })
+  const [tons, setTons] = useState(
+    ministeriosNames.reduce((p, c) => ({ ...p, [c]: "" }))
+  )
+  const [lastPlayeds, setLastPlayeds] = useState(
+    ministeriosNames.reduce((p, c) => ({ ...p, [c]: "" }))
+  )
   const [isOpen, setIsOpen] = useState(false)
   const onClose = () => setIsOpen(false)
   const cancelRef = useRef()
-
   const history = useHistory()
   const { id } = useParams()
+
   useEffect(() => {
     api.get(`/music/${id}`).then(res => {
       const data = res.data
       setValue(data)
 
-      const alber = data.ministeriosInfo.find(e => e.ministerio === "sdn-alber")
-      const lucy = data.ministeriosInfo.find(e => e.ministerio === "sdn-lucy")
-      const adolescentes = data.ministeriosInfo.find(e => e.ministerio === "adolescentes")
-      const ministerios = {
-        "sdn-alber": alber?.tom,
-        "sdn-lucy": lucy?.tom,
-        adolescentes: adolescentes?.tom
-      }
-      setMinisterios(ministerios)
-      const lastPlayeds = {
-        "sdn-alber": alber?.lastPlayed,
-        "sdn-lucy": lucy?.lastPlayed,
-        adolescentes: adolescentes?.lastPlayed
-      }
+      const ministerios = ministeriosNames.reduce((p, c) => ({
+        ...p, [c]: data.ministeriosInfo.find(e => e.ministerio === c)
+      }))
+
+      const tons = ministeriosNames.reduce((p, c) => ({
+        ...p, [c]: ministerios[c]?.tom
+      }))
+      const lastPlayeds = ministeriosNames.reduce((p, c) => ({
+        ...p, [c]: ministerios[c]?.lastPlayed
+      }))
+      setTons(tons)
       setLastPlayeds(lastPlayeds)
     }).catch(err => console.log(err))
   }, [id])
@@ -56,7 +49,7 @@ function Update({ fetchMusics, setLoading }) {
     setValue(prev => ({ ...prev, [e.target.name]: e.target.value }))
   }
   const handleChangeTom = (e) => {
-    setMinisterios(prev => ({ ...prev, [e.target.name]: e.target.value }))
+    setTons(prev => ({ ...prev, [e.target.name]: e.target.value }))
   }
   const handleChangeLast = (e) => {
     setLastPlayeds(prev => ({ ...prev, [e.target.name]: e.target.value }))
@@ -65,11 +58,11 @@ function Update({ fetchMusics, setLoading }) {
     e.preventDefault()
 
     await api.put(`/music/${id}`, value).then(res => {
-      (["sdn-alber", "sdn-lucy", "adolescentes"]).forEach(async element => {
-        await api.put(`/music/${id}/${element}`, {
-          tom: ministerios[element],
-          ministerio: element,
-          "lastPlayed": lastPlayeds[element]
+      ministeriosNames.forEach(async name => {
+        await api.put(`/music/${id}/${name}`, {
+          tom: tons[name],
+          ministerio: name,
+          lastPlayed: lastPlayeds[name]
         }).then(res => {
           fetchMusics()
           history.push("/")
@@ -93,27 +86,32 @@ function Update({ fetchMusics, setLoading }) {
 
             <Input onChange={handleChange} name="name" value={value.name} placeholder="Música" isRequired />
             <Input onChange={handleChange} name="author" value={value.author} placeholder="Artista" isRequired />
+
             <Select onChange={handleChange} name="gender" value={value.gender} placeholder="Selecione um Gênero" isRequired>
-              {generos.map(genero => (
+              {genders.map(genero => (
                 <option key={genero} value={genero}>{genero}</option>
               ))}
             </Select>
+
             <HStack spacing={4}>
               <Input onChange={handleChange} name="linkCifra" value={value.linkCifra} type="url" placeholder="Link CifraClub" />
               <Input onChange={handleChange} name="linkYoutube" value={value.linkYoutube} type="url" placeholder="Link Youtube" />
             </HStack>
+
             <Divider />
-            <Text><b>Tom:</b> Alber / Lucy Mary / Adolescentes</Text>
+
+            <Text><b>Tom:</b> {ministeriosNames.join(" / ")}</Text>
             <HStack spacing={4}>
-              <Input onChange={handleChangeTom} name="sdn-alber" value={ministerios["sdn-alber"]} placeholder="Alber" />
-              <Input onChange={handleChangeTom} name="sdn-lucy" value={ministerios["sdn-lucy"]} placeholder="Lucy Mary" />
-              <Input onChange={handleChangeTom} name="adolescentes" value={ministerios.adolescentes} placeholder="Adolescentes" />
+              {ministeriosNames.map(name => (
+                <Input key={name} onChange={handleChangeTom} name={name} value={tons[name]} placeholder={name} />
+              ))}
             </HStack>
-            <Text><b>Última vez tocada:</b> Alber / Lucy Mary / Adolescentes</Text>
+
+            <Text><b>Última vez tocada:</b> {ministeriosNames.join(" / ")}</Text>
             <HStack spacing={4}>
-              <Input size="sm" type="date" onChange={handleChangeLast} name="sdn-alber" value={lastPlayeds["sdn-alber"]} />
-              <Input size="sm" type="date" onChange={handleChangeLast} name="sdn-lucy" value={lastPlayeds["sdn-lucy"]} />
-              <Input size="sm" type="date" onChange={handleChangeLast} name="adolescentes" value={lastPlayeds.adolescentes} />
+              {ministeriosNames.map(name => (
+                <Input size="sm" type="date" onChange={handleChangeLast} name={name} value={lastPlayeds[name]} />
+              ))}
             </HStack>
 
             <HStack spacing={4} pt={5}>
