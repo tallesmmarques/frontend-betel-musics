@@ -7,9 +7,29 @@ import {
   useMediaQuery,
   Divider,
 } from "@chakra-ui/react"
+import { useEffect } from "react"
+import { useState } from "react"
 import ListMusics from "../components/listMusics"
 
 function Home({ musics, events, setEventMusics, fetchMusics }) {
+  const [search, setSearch] = useState("")
+  const [filteredMusics, setFilteredMusics] = useState(musics)
+
+  useEffect(() => {
+    const searchString = search.toLocaleLowerCase()
+
+    const filtered = musics.filter(music =>
+      music.name.toLowerCase().includes(searchString) ||
+      music.author.toLowerCase().includes(searchString)
+    )
+
+    setFilteredMusics(filtered)
+  }, [search, musics])
+
+  const handleSearch = (e) => {
+    setSearch(e.target.value)
+  }
+
   return (
     <Flex bg="#f3f4f5" minH="100vh" maxW="100vw" w="100%" flexDirection="column">
 
@@ -29,7 +49,7 @@ function Home({ musics, events, setEventMusics, fetchMusics }) {
 
       <Divider />
 
-      <ListMusics musics={musics} title="Todas Músicas" setEventMusics={setEventMusics} />
+      <ListMusics musics={filteredMusics} search={search} handleSearch={handleSearch} title="Todas Músicas" setEventMusics={setEventMusics} />
 
       {/* {useMediaQuery("(min-width: 1000px)")[0] ? (
         <TableMusics musics={musics} title="Todas Músicas" ministerio="all" />

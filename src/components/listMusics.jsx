@@ -30,14 +30,10 @@ import { ministeriosNames } from "../service/definitions"
 import { addDays } from "date-fns/esm"
 import api from "../service/api"
 
-function ListMusics({ musics, title, isEvent, event, setEventMusics, fetchMusics }) {
-  const [search, setSearch] = useState("")
+function ListMusics({ musics, title, isEvent, event, setEventMusics, fetchMusics, search, handleSearch }) {
   const [list, setList] = useState({})
   const history = useHistory()
 
-  const handleSearch = (e) => {
-    setSearch(e.target.value)
-  }
   const handleCreateList = () => {
     let listIds = []
     for (const [key, value] of Object.entries(list)) {

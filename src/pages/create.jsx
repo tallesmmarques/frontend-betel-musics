@@ -41,15 +41,15 @@ function Create({ fetchMusics }) {
   return (
     <Center bg="#f3f4f5" minH="100vh">
       <Box bg="white" p="1.5rem" py="2rem" w="450px" borderRadius="sm" shadow="md" overflowX="auto">
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} autoComplete="off">
           <Stack spacing={4}>
             <Heading size="lg" textAlign="center" mb="1rem">Criar Música</Heading>
 
             <Input onChange={handleChange} name="name" value={value.name} placeholder="Música" isRequired />
             <Input onChange={handleChange} name="author" value={value.author} placeholder="Artista" isRequired />
             <Select onChange={handleChange} name="gender" value={value.gender} placeholder="Selecione um Gênero" isRequired>
-              {genders.map(gender => (
-                <option key={gender} value={gender}>{gender}</option>
+              {genders.map((gender, index) => (
+                <option key={index} value={gender}>{gender}</option>
               ))}
             </Select>
             <HStack spacing={4}>

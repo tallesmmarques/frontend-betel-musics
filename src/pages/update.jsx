@@ -80,7 +80,7 @@ function Update({ fetchMusics, setLoading }) {
   return (
     <Center bg="#f3f4f5" minH="100vh">
       <Box bg="white" p="1.5rem" py="2rem" w="550px" borderRadius="sm" shadow="md" overflowX="auto">
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} autoComplete="off">
           <Stack spacing={4}>
             <Heading size="lg" textAlign="center" mb="1rem">Atualizar Música</Heading>
 
@@ -88,8 +88,8 @@ function Update({ fetchMusics, setLoading }) {
             <Input onChange={handleChange} name="author" value={value.author} placeholder="Artista" isRequired />
 
             <Select onChange={handleChange} name="gender" value={value.gender} placeholder="Selecione um Gênero" isRequired>
-              {genders.map(genero => (
-                <option key={genero} value={genero}>{genero}</option>
+              {genders.map((gender, index) => (
+                <option key={index} value={gender}>{gender}</option>
               ))}
             </Select>
 
