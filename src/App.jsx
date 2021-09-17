@@ -78,7 +78,7 @@ function App() {
           <CreateList eventMusics={eventMusics} fetchMusics={fetchMusics} />
         </Route>
         <Route path="/updatelist/:id">
-          <UpdateList eventMusics={eventMusics} fetchMusics={fetchMusics} />
+          <UpdateList eventMusics={eventMusics} events={events} fetchMusics={fetchMusics} />
         </Route>
         <Route path="/">
           <Home

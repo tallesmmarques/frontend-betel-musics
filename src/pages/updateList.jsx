@@ -7,20 +7,27 @@ import { ministeriosNames } from "../service/definitions"
 import Dialog from "../components/dialog"
 import Loading from "../components/loading"
 
-function UpdateList({ fetchMusics, eventMusics }) {
+function UpdateList({ fetchMusics, eventMusics, events }) {
   const [value, setValue] = useState({
     title: "",
     ministerio: "",
     date: ""
   })
   const [loading, setLoading] = useState(true)
-  console.log("EventMusics", eventMusics)
-
   const [isOpen, setIsOpen] = useState(false)
   const onClose = () => setIsOpen(false)
   const cancelRef = useRef()
   const history = useHistory()
   const { id } = useParams()
+
+  const musicsToDelete = events
+    .find(e => e.id === Number(id))
+    .musics
+    .filter(mus => !mus.selected)
+  const musicsToNotDelete = events
+    .find(e => e.id === Number(id))
+    .musics
+    .filter(mus => mus.selected)
 
   useEffect(() => {
     setLoading(true)
@@ -36,8 +43,7 @@ function UpdateList({ fetchMusics, eventMusics }) {
   }
   const handleSubmit = async (e) => {
     e.preventDefault()
-    const data = { ...value, musics: [...eventMusics, ...value.musics] }
-    console.log(data)
+    const data = { ...value, musics: [...eventMusics, ...musicsToNotDelete] }
     api.put(`/event/${id}`, data).then(res => {
       fetchMusics()
       history.push("/")
@@ -81,19 +87,34 @@ function UpdateList({ fetchMusics, eventMusics }) {
               <Input type="date" onChange={handleChange} name="date" value={value.date} placeholder="Dia do evento" isRequired />
             </FormControl>
 
-            <Heading size="md" pt="20px">Músicas salvas:</Heading>
+            <Heading size="md" pt="20px">Músicas atuais:</Heading>
             <UnorderedList pl="10px">
               {value?.musics.map(music =>
                 <ListItem m="10px" key={music.id}>{music.name} - {music.author}</ListItem>
               )}
             </UnorderedList>
 
-            <Heading size="md" pt="20px">Músicas há serem adicionadas:</Heading>
-            <UnorderedList pl="10px">
-              {eventMusics.map(music =>
-                <ListItem m="10px" key={music.id}>{music.name} - {music.author}</ListItem>
-              )}
-            </UnorderedList>
+            {eventMusics === [] && (
+              <>
+                <Heading size="md" pt="20px">Músicas há serem adicionadas:</Heading>
+                <UnorderedList pl="10px">
+                  {eventMusics.map(music =>
+                    <ListItem m="10px" color="green.600" key={music.id}>{music.name} - {music.author}</ListItem>
+                  )}
+                </UnorderedList>
+              </>
+            )}
+
+            {musicsToDelete === [] && (
+              <>
+                <Heading size="md" pt="20px">Músicas há serem removidas:</Heading>
+                <UnorderedList pl="10px">
+                  {musicsToDelete.map(music =>
+                    <ListItem m="10px" color="red.600" key={music.id}>{music.name} - {music.author}</ListItem>
+                  )}
+                </UnorderedList>
+              </>
+            )}
 
             <HStack spacing={4} pt={5}>
               <Button flex="1" colorScheme="blue" variant="outline" onClick={() => history.push("/")}>Cancelar</Button>
