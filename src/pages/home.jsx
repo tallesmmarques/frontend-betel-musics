@@ -34,7 +34,7 @@ function Home({ musics, events, setEventMusics, setEvents, setMusics, fetchMusic
   }
 
   return (
-    <Flex bg="#f3f4f5" minH="100vh" maxW="100vw" w="100%" flexDirection="column">
+    <Flex bg="#f3f4f5" minH="100vh" maxW="100vw" pb="50px" w="100%" flexDirection="column">
 
       <Box h="5px" bg="blue.500"></Box>
 

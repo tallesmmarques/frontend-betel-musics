@@ -1,10 +1,14 @@
-import { Box, Button, Center, Divider, Heading, HStack, Input, Select, Stack, Text } from "@chakra-ui/react"
+import { SearchIcon } from "@chakra-ui/icons"
+import { Box, Button, Center, Divider, Heading, HStack, Input, InputGroup, Select, Stack, Text, useDisclosure } from "@chakra-ui/react"
 import { useState } from "react"
 import { useHistory } from "react-router-dom"
+
 import api from "../service/api"
 import { ministeriosNames, genders } from "../service/definitions"
+import SearchMusic from "../components/searchMusic"
 
 function Create({ fetchMusics }) {
+  const { isOpen, onOpen, onClose } = useDisclosure()
   const [value, setValue] = useState({
     name: "",
     author: "",
@@ -45,7 +49,14 @@ function Create({ fetchMusics }) {
           <Stack spacing={4}>
             <Heading size="lg" textAlign="center" mb="1rem">Criar Música</Heading>
 
-            <Input onChange={handleChange} name="name" value={value.name} placeholder="Música" isRequired />
+            <Button colorScheme="yellow" onClick={onOpen}>
+              Pesquisar por música <SearchIcon ml="10px" />
+            </Button>
+
+            <InputGroup>
+              <Input onChange={handleChange} name="name" value={value.name} placeholder="Música" isRequired />
+            </InputGroup>
+
             <Input onChange={handleChange} name="author" value={value.author} placeholder="Artista" isRequired />
             <Select onChange={handleChange} name="gender" value={value.gender} placeholder="Selecione um Gênero" isRequired>
               {genders.map((gender, index) => (
@@ -70,6 +81,13 @@ function Create({ fetchMusics }) {
           </Stack>
         </form>
       </Box>
+
+      <SearchMusic
+        isOpen={isOpen}
+        onClose={onClose}
+        value={value}
+        setValue={setValue}
+      />
     </Center>
   )
 }

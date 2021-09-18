@@ -188,7 +188,7 @@ function ListMusics({ musics, title, isEvent, setGenderFilter, event, setEventMu
       </Accordion >
 
       {isEvent && (
-        <Flex mt="10px" px="20px" justifyContent="flex-end">
+        <Flex bg="white" p="20px" shadow="sm" py="10px" justifyContent="flex-end">
           <Button colorScheme="orange" variant="solid" onClick={() => setIsOpen(true)}>Tocada <CheckIcon ml="10px" /> </Button>
           <Button colorScheme={haveList ? "yellow" : "green"} variant="solid" ml="10px" onClick={() => history.push(`/updatelist/${event.id}`)}>Editar <EditIcon ml="10px" /> </Button>
         </Flex>
